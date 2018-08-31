@@ -12,7 +12,7 @@ D=50
 E=5
 
 cd equil/
-
+#test
 cp ../prep/*.prmtop .
 cp ../prep/*.inpcrd .
 
