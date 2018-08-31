@@ -1,0 +1,96 @@
+#!/bin/sh
+
+#Set atom count that you want it to have save in the mdcrd file and set prmtop value without the .prmtop extension, just the name. Add a comment to the last line of this code if you are not confident it will generate the files correctly.
+
+cd production/
+
+atom_count=9578
+prmtop=vp1_glycan
+
+cp ../prep/$prmtop.prmtop .
+
+cat > production.in <<EOF
+initial minimization w/ position restraints on DNA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0, 
+  ntx    = 5,       irest  = 1,       ntrx   = 1,      ntxo   = 2,
+  ntpr   = 10000,      ntwx   = 500,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 1, ntwr = 50000,
+  ntwprt = $atom_count,
+
+  ntf    = 2,       ntb    = 2,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 0,
+
+  imin   = 0,       
+  maxcyc = 1000,   
+  ncyc   = 5000,   
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 50000000,
+  nscm   = 10000, iwrap = 0,
+  t      = 0.0,     dt     = 0.002,
+
+  temp0  = 300.0,   tempi  = 100.0,   
+  ig     = -1,   
+  ntt    = 3,       
+  tautp  = 2.0,  
+  gamma_ln = 1.0,
+
+  ntp    = 1,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 1.0,  
+  barostat = 2,
+
+  ntc    = 2,       tol    = 0.0001,
+
+  jfastw = 0,       
+
+  ivcap  = 0,       fcap   = 1.5,
+/
+EOF
+
+cat >jobp.in <<EOF
+#!/bin/csh
+
+#First four lines are for AMBER14 single gpu usage, next four lines are for AMBER14 with dual gpu usage. Next four are for AMBER16 single gpu usage, last four are for AMBER16 dual gpu usage. Comment out accordingly.
+
+#setenv CUDA_HOME /usr/local/cuda-6.5
+#setenv LD_LIBRARY_PATH "/usr/local/cuda-6.5/lib64:\${LD_LIBRARY_PATH}"
+#setenv PATH "/usr/local/cuda-6.5/bin:\${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0"
+
+#setenv CUDA_HOME /usr/local/cuda-6.5
+#setenv LD_LIBRARY_PATH "/usr/local/cuda-6.5/lib64:/software/openmpi.1.8.1/lib:\${LD_LIBRARY_PATH}"
+#setenv PATH "/usr/local/cuda-6.5/bin:\${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0,1"
+
+#setenv CUDA_HOME /software/usr/cuda-7.5
+#setenv LD_LIBRARY_PATH "/software/usr/cuda-7.5/lib64:\${LD_LIBRARY_PATH}"
+#setenv PATH "/software/usr/cuda-7.5/bin:\${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "1"
+
+#setenv CUDA_HOME /software/usr/cuda-7.5
+#setenv LD_LIBRARY_PATH "/software/usr/cuda-7.5/lib64:/software/openmpi.1.8.1/lib:\${LD_LIBRARY_PATH}"
+#setenv PATH "/software/usr/cuda-7.5/bin:\${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0,1"
+
+setenv CUDA_HOME /software/usr/cuda-8.0
+setenv LD_LIBRARY_PATH /software/usr/cuda-8.0/lib64:/usr/lib64/openmpi/lib/:\${LD_LIBRARY_PATH}
+setenv PATH "/software/usr/cuda-8.0/bin:\${PATH}"
+setenv CUDA_VISIBLE_DEVICES "0"
+
+set prv=0
+
+foreach cur (A B C D E)
+  pmemd.cuda -O -i production.in -p $prmtop.prmtop -c production.\$prv.restrt -o production.\$cur.out -r production.\$cur.restrt -x production.\$cur.mdcrd 
+
+  set prv=\$cur
+end
+EOF
+
+chmod +x jobp.in 
+
+#./jobp.in >& err.log 

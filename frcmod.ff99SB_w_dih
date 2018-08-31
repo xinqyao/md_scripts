@@ -1,0 +1,14 @@
+Modification of parm99.dat for peptide omega bond from Doshi & Hamelberg JPCB (2009)
+MASS
+
+BOND
+
+ANGL
+
+DIHEDRAL
+X -C -N -X    4   14.00        180.0             2.         JPCB,113,(2009),16590
+H -N -C -O    1    2.90        180.0            -2.         JPCB,113,(2009),16590
+H -N -C -O    1    1.00          0.0             1.         JPCB,113,(2009),16590
+
+NONB
+

@@ -1,0 +1,49 @@
+#!/bin/sh
+#Use this script with caution, only run the last command if you are confident that your system will be ready to minimize and equilibrate after this script runs. Attach an # sign in front of the last command if not confident enough. Set varible pdb in this file to the pdb that you are needing to setup. have it in this folder where this script resides. This script will create a prep, equil, and production folder to help you know where everything is. 
+
+mkdir prep
+mkdir equil
+mkdir production
+
+pdb='prot'
+lig1='glycan_A'
+lig2='glycan_B'
+wat='wat'
+cd prep/
+
+#cp /home/mmomin/Desktop/xleap/leaprc.phosaa10 .
+#cp /home/mmomin/Desktop/xleap/*.lib .
+#cp /home/mmomin/Desktop/xleap/frcmod.ff99SB_w_dih .
+#cp ../*.pdb .
+cp ../$pdb.pdb .
+cp ../$lig1.pdb .
+cp ../$lig2.pdb .
+cp ../$wat.pdb .
+#cp ../frcmod.ff99SB_w_dih .
+cp /home/xinqyao/projects/ff/frcmod.ff99SB_w_dih ./
+
+cat >tleap.in << EOF
+source leaprc.protein.ff14SB
+#source leaprc.phosaa10
+#source leaprc.phosaa10.ff14sb
+source leaprc.GLYCAM_06j-1
+source leaprc.water.tip3p
+loadamberparams frcmod.ionsjc_tip3p
+loadamberparams frcmod.ff99SB_w_dih
+set default PBradii mbondi2
+m1 = loadpdb $pdb.pdb
+m2 = loadpdb $lig1.pdb
+m3 = loadpdb $lig2.pdb
+m4 = loadpdb $wat.pdb
+sys = combine { m1 m2 m3 m4 }
+solvateoct sys TIP3PBOX 10.0
+addions sys Na+ 0
+addions sys Cl- 0
+savepdb sys vp1_glycan.xleap.pdb
+saveamberparm sys vp1_glycan.prmtop vp1_glycan.inpcrd
+quit
+EOF
+
+tleap -f tleap.in &>log
+
+#./new_equil.in >& err.log 

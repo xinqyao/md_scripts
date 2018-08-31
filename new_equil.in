@@ -1,0 +1,399 @@
+#!/bin/sh
+
+##R1 is for last residue,i.e. RES 1 to X hold. Variable A is for minimization force constant that will automatically decrease by 100, from 500 in min1 to 100 in min5.in. Parameters for variables B,C,D, and E are the md1, md2..etc. force constants. Set varible R1 and leave everything else untouched if you don't know what to use or change. If not confident in the setup then put # sign on last line of this code to just setup and not run the system.
+
+R1=622
+
+F=600
+A=500
+B=300
+C=100
+D=50
+E=5
+
+cd equil/
+
+cp ../prep/*.prmtop .
+cp ../prep/*.inpcrd .
+
+cat >jobe.in<<EOF
+#!/bin/csh 
+
+##Know if you are running on Amber16 or Amber14. The first five setenv commands are for AMBER14 next five are for AMBER16. Use # command to comment out whatever version you are not using. If not confident in the run then put # sign at the last line of the code to avoid running production.
+
+#setenv LD_LIBRARY_PATH "/software/openmpi.1.8.1/lib:\${LD_LIBRARY_PATH}"
+#setenv CUDA_HOME /usr/local/cuda-6.5
+#setenv LD_LIBRARY_PATH "/usr/local/cuda-6.5/lib64:\${LD_LIBRARY_PATH}"
+#setenv PATH "/usr/local/cuda-6.5/bin:\${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0"
+
+#setenv LD_LIBRARY_PATH "/software/openmpi.1.8.1/lib:\${LD_LIBRARY_PATH}"
+#setenv CUDA_HOME /software/usr/cuda-7.5
+#setenv LD_LIBRARY_PATH "/software/usr/cuda-7.5/lib64:\${LD_LIBRARY_PATH}"
+#setenv PATH "/software/usr/cuda-7.5/bin:\${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "1"
+
+setenv LD_LIBRARY_PATH "/usr/lib64/openmpi/lib/:\${LD_LIBRARY_PATH}"
+setenv CUDA_HOME /software/usr/cuda-8.0
+setenv LD_LIBRARY_PATH "/software/usr/cuda-8.0/lib64:\${LD_LIBRARY_PATH}"
+setenv PATH "/software/usr/cuda-8.0/bin:\${PATH}"
+setenv CUDA_VISIBLE_DEVICES "0"
+
+  /usr/lib64/openmpi/bin/mpirun -v -np 10 pmemd.MPI -O -i min1.in -p *.prmtop -c *.inpcrd -o min1.out -r min1.restrt -ref *.inpcrd
+  /usr/lib64/openmpi/bin/mpirun -v -np 10 pmemd.MPI -O -i min2.in -p *.prmtop -c min1.restrt -o min2.out -r min2.restrt -ref min1.restrt 
+  /usr/lib64/openmpi/bin/mpirun -v -np 10 pmemd.MPI -O -i min3.in -p *.prmtop -c min2.restrt -o min3.out -r min3.restrt -ref min2.restrt 
+  /usr/lib64/openmpi/bin/mpirun -v -np 10 pmemd.MPI -O -i min4.in -p *.prmtop -c min3.restrt -o min4.out -r min4.restrt -ref min3.restrt 
+  /usr/lib64/openmpi/bin/mpirun -v -np 10 pmemd.MPI -O -i min5.in -p *.prmtop -c min4.restrt -o min5.out -r min5.restrt -ref min4.restrt 
+  /usr/lib64/openmpi/bin/mpirun -v -np 10 pmemd.MPI -O -i min6.in -p *.prmtop -c min5.restrt -o min6.out -r min6.restrt -ref min5.restrt
+
+  pmemd.cuda -O -i md1.in -p *.prmtop -c min6.restrt -o md1.out -r md1.restrt -ref min6.restrt 
+  pmemd.cuda -O -i md2.in -p *.prmtop -c md1.restrt -o md2.out -r md2.restrt -ref md1.restrt 
+  pmemd.cuda -O -i md3.in -p *.prmtop -c md2.restrt -o md3.out -r md3.restrt -ref md2.restrt 
+  pmemd.cuda -O -i md4.in -p *.prmtop -c md3.restrt -o md4.out -r md4.restrt -ref md3.restrt 
+  pmemd.cuda -O -i md5.in -p *.prmtop -c md4.restrt -o md5.out -r md5.restrt -ref md4.restrt 
+  pmemd.cuda -O -i equil.in -p *.prmtop -c md5.restrt -o equil.out -r equil.restrt
+
+cp equil.restrt ../production/
+cd ../production
+mv equil.restrt production.0.restrt
+#./jobp.in >& err.log 
+EOF
+
+chmod +x jobe.in
+
+#foreach min (1 2 3 4 5 6)
+for((min=1; min<=6; min++)); do
+ let F=F-100
+# @ F = $F - 100
+
+cat > min$min.in << EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0, 
+  ntx    = 1,       irest  = 0,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 100,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0,
+  ntwprt = 0,
+
+  ntf    = 1,       ntb    = 2,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 1,
+
+  imin   = 1,       
+  maxcyc = 5000,   
+  ncyc   = 2000,   
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 10000,
+  nscm   = 0, iwrap = 0,
+  t      = 0.0,     dt     = 0.001,
+
+  temp0  = 300.0,   tempi  = 100.0,   
+  ig     = -1,   
+  ntt    = 1,       
+  tautp  = 0.2,  
+  vlimit = 20.0,
+
+  ntp    = 1,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 0.2,  
+
+  ntc    = 1,       tol    = 0.0005,
+
+  jfastw = 0,       
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+hold
+$F
+RES 1 $R1
+END
+END
+EOF
+
+done
+#end
+
+cat > md1.in <<EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0, 
+  ntx    = 1,       irest  = 0,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 100,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0, ntwr = 5000,
+  ntwprt = 0,
+
+  ntf    = 2,       ntb    = 1,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 1,
+
+  imin   = 0,       
+  maxcyc = 1000,   
+  ncyc   = 5000,   
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 500000,
+  nscm   = 0, iwrap = 0,
+  t      = 0.0,     dt     = 0.001,
+
+  temp0  = 300.0,   tempi  = 100.0,   
+  ig     = -1,   
+  ntt    = 3,       
+  tautp  = 0.2,  
+  gamma_ln = 1.0,
+
+  ntp    = 0,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 0.2,  
+
+  ntc    = 2,       tol    = 0.0005,
+
+  jfastw = 0,       
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+hold
+$A
+RES 1 $R1
+END
+END
+EOF
+
+cat > md2.in <<EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0,
+  ntx    = 1,       irest  = 0,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 100,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0, ntwr = 5000,
+  ntwprt = 0,
+
+  ntf    = 2,       ntb    = 1,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 1,
+
+  imin   = 0,
+  maxcyc = 1000,
+  ncyc   = 5000,
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 500000,
+  nscm   = 0, iwrap = 0,
+  t      = 0.0,     dt     = 0.001,
+
+  temp0  = 300.0,   tempi  = 100.0,
+  ig     = -1,
+  ntt    = 3,
+  tautp  = 0.2,
+  gamma_ln = 1.0,
+
+  ntp    = 0,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 0.2,
+
+  ntc    = 2,       tol    = 0.0005,
+
+  jfastw = 0,
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+hold
+$B
+RES 1 $R1
+END
+END
+EOF
+
+cat > md3.in <<EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0,
+  ntx    = 1,       irest  = 0,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 100,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0, ntwr = 5000,
+  ntwprt = 0,
+
+  ntf    = 2,       ntb    = 1,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 1,
+
+  imin   = 0,
+  maxcyc = 1000,
+  ncyc   = 5000,
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 500000,
+  nscm   = 0, iwrap = 0,
+  t      = 0.0,     dt     = 0.001,
+
+  temp0  = 300.0,   tempi  = 100.0,
+  ig     = -1,
+  ntt    = 3,
+  tautp  = 0.2,
+  gamma_ln = 1.0,
+
+  ntp    = 0,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 0.2,
+
+  ntc    = 2,       tol    = 0.0005,
+
+  jfastw = 0,
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+hold
+$C
+RES 1 $R1
+END
+END
+EOF
+
+cat > md4.in <<EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0,
+  ntx    = 1,       irest  = 0,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 100,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0, ntwr = 5000,
+  ntwprt = 0,
+
+  ntf    = 2,       ntb    = 1,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 1,
+
+  imin   = 0,
+  maxcyc = 1000,
+  ncyc   = 5000,
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 500000,
+  nscm   = 0, iwrap = 0,
+  t      = 0.0,     dt     = 0.001,
+
+  temp0  = 300.0,   tempi  = 100.0,
+  ig     = -1,
+  ntt    = 3,
+  tautp  = 0.2,
+  gamma_ln = 1.0,
+
+  ntp    = 0,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 0.2,
+
+  ntc    = 2,       tol    = 0.0005,
+
+  jfastw = 0,
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+hold
+$D
+RES 1 $R1
+END
+END
+EOF
+
+cat > md5.in <<EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0,
+  ntx    = 1,       irest  = 0,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 100,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0, ntwr = 5000,
+  ntwprt = 0,
+
+  ntf    = 2,       ntb    = 1,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 1,
+
+  imin   = 0,
+  maxcyc = 1000,
+  ncyc   = 5000,
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 500000,
+  nscm   = 0, iwrap = 0,
+  t      = 0.0,     dt     = 0.001,
+
+  temp0  = 300.0,   tempi  = 100.0,
+  ig     = -1,
+  ntt    = 3,
+  tautp  = 0.2,
+  gamma_ln = 1.0,
+
+  ntp    = 0,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 0.2,
+
+  ntc    = 2,       tol    = 0.0005,
+
+  jfastw = 0,
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+hold
+$E
+RES 1 $R1
+END
+END
+EOF
+
+cat >equil.in <<EOF
+Initial minimization w/ position restraints on CypA, 9.0 cut
+ &cntrl
+  timlim = 999999, nmropt = 0, 
+  ntx    = 5,       irest  = 1,       ntrx   = 1,      ntxo   = 1,
+  ntpr   = 5000,      ntwx   = 0,       ntwv   = 0,      ntwe   = 0,
+  ioutfm = 0, ntwr = 5000,
+  ntwprt = 0,
+
+  ntf    = 2,       ntb    = 2,       igb  = 0,      dielc  = 1.0,
+  cut    = 9.0,     nsnb   = 10,
+
+  ipol   = 0,
+
+  ibelly = 0,       ntr    = 0,
+
+  imin   = 0,       
+  maxcyc = 1000,   
+  ncyc   = 5000,   
+  ntmin  = 1,       dx0    = 0.1,     drms   = 0.0001,
+
+  nstlim = 500000,
+  nscm   = 10000, iwrap = 0,
+  t      = 0.0,     dt     = 0.002,
+
+  temp0  = 300.0,   tempi  = 100.0,   
+  ig     = -1,   
+  ntt    = 3,       
+  tautp  = 2.0,  
+  gamma_ln = 1.0,
+
+  ntp    = 1,       pres0  = 1.0,     comp   = 44.6,
+  taup   = 1.0,  
+  barostat = 2,
+
+  ntc    = 2,       tol    = 0.0001,
+
+  jfastw = 0,       
+
+  ivcap  = 0,       fcap   = 1.5,
+ /
+EOF
+
+chmod +x *.in
+
+#./jobe.in >& err.log 
