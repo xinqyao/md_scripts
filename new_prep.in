@@ -36,7 +36,7 @@ m2 = loadpdb $lig1.pdb
 m3 = loadpdb $lig2.pdb
 m4 = loadpdb $wat.pdb
 sys = combine { m1 m2 m3 m4 }
-solvateoct sys TIP3PBOX 10.0
+solvateoct sys TIP3PBOX 10.0 iso
 addions sys Na+ 0
 addions sys Cl- 0
 savepdb sys vp1_glycan.xleap.pdb
