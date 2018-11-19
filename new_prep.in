@@ -35,6 +35,12 @@ m1 = loadpdb $pdb.pdb
 m2 = loadpdb $lig1.pdb
 m3 = loadpdb $lig2.pdb
 m4 = loadpdb $wat.pdb
+
+## for analysis purpose
+sysnowat = combine { m1 m2 m3 }
+savepdb sysnowat vp1_glycan_nowat.pdb
+saveamberparm sysnowat vp1_glycan_nowat.prmtop vp1_glycan_nowat.inpcrd
+
 sys = combine { m1 m2 m3 m4 }
 solvateoct sys TIP3PBOX 10.0 iso
 addions sys Na+ 0
