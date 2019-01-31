@@ -1,0 +1,22 @@
+parm ../../XX_nowat.prmtop
+reference ../../../prep/XX_nowat.pdb
+trajin ../../production.A.mdcrd
+trajin ../../production.B.mdcrd
+trajin ../../production.C.mdcrd
+#...
+
+#         #system res.
+center :1-XXX
+image center familiar
+rms reference out rms_bb.out :1-XXX@CA,C,N
+#rms first out rms_lig1.out (:613-617)&(!@H=)
+#rms first out rms_lig2.out (:618-622)&(!@H=)
+#rms first out rms_sp_ww.out :7-34@CA,C,N
+#rms first out rms_sp_pin1.out :53-163@CA,C,N
+#rms first out sp.out :164-189@CA,C,N
+#distance out dist_SEP_ARG17.out :181@P :17@CZ
+#distance out dist_SEP2_ARG68.out :171@P :68@CZ
+#distance out dist_SEP2_ARG69.out :171@P :69@CZ
+#distance out dist_SEP2_LYS63.out :171@P :63@CE
+go
+
