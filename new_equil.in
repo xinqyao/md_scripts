@@ -1,6 +1,10 @@
 #!/bin/sh
 
-##R1 is for last residue,i.e. RES 1 to X hold. Variable A is for minimization force constant that will automatically decrease by 100, from 500 in min1 to 100 in min5.in. Parameters for variables B,C,D, and E are the md1, md2..etc. force constants. Set varible R1 and leave everything else untouched if you don't know what to use or change. If not confident in the setup then put # sign on last line of this code to just setup and not run the system.
+## R1 is for last residue,i.e. RES 1 to X hold. 
+## Variable A is for minimization force constant that will automatically decrease by 100, from 500 in min1 to 100 in min5.in. 
+## Parameters for variables B,C,D, and E are the md1, md2..etc. force constants. 
+## Set varible R1 and leave everything else untouched if you don't know what to use or change. 
+## If not confident in the setup then put # sign on last line of this code to just setup and not run the system.
 
 R1=622
 
@@ -11,10 +15,12 @@ C=100
 D=50
 E=5
 
+sys=wt_lig_box
+
 cd equil/
 #test
-cp ../prep/*.prmtop .
-cp ../prep/*.inpcrd .
+cp ../prep/${sys}.prmtop .
+cp ../prep/${sys}.inpcrd .
 
 cat >jobe.in<<EOF
 #!/bin/csh 

@@ -1,11 +1,12 @@
 #!/bin/sh
 
-#Set atom count that you want it to have save in the mdcrd file and set prmtop value without the .prmtop extension, just the name. Add a comment to the last line of this code if you are not confident it will generate the files correctly.
+# Set atom count that you want it to have save in the mdcrd file and set prmtop value without the .prmtop extension, just the name. 
+# Add a comment to the last line of this code if you are not confident it will generate the files correctly.
 
 cd production/
 
 atom_count=9578
-prmtop=vp1_glycan
+prmtop=wt_lig_box
 
 cp ../prep/$prmtop.prmtop .
 
