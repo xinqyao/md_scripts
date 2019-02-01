@@ -34,6 +34,7 @@ source leaprc.water.tip3p
 #loadamberparams frcmod.ff99SB_w_dih #uncomment if simulating cis-trans isomerizatino
 set default PBradii mbondi2
 m1 = loadpdb $pdb.pdb
+# bond m1.XXX.SG m1.YYY.SG  # uncomment if having disulfide bonds; XXX and YYY are corresponding cysteins. Add more lines if more than one disulfide bonds. Remember, the affected cysteins must be named 'CYX' in the PDB file.
 m2 = loadpdb $lig.pdb
 m3 = loadpdb $wat.pdb
 
