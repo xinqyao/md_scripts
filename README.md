@@ -8,37 +8,37 @@ Normally, a MD simulation starts with a crystallographic structure from PDB.
 Prior to any processing, ask following questions:
 
 * What is the biological unit/assembly you want to simulate?
-   - This is to determine chains and cofactors to be included in the simulation.
-   - Sometimes, a PDB file does not give a complete structure of a functional complex 
-     due to symmetry. For example, `2DN1` contains only two chains but the system it 
-     represents (i.e., hemoglobin) is a tetramer. Use `bio3d` to reconstruct the 
-     biological unit, or download it directly from PDB.
+    - This is to determine chains and cofactors to be included in the simulation.
+    - Sometimes, a PDB file does not give a complete structure of a functional complex 
+      due to symmetry. For example, `2DN1` contains only two chains but the system it 
+      represents (i.e., hemoglobin) is a tetramer. Use `bio3d` to reconstruct the 
+      biological unit, or download it directly from PDB.
 
 * Are there missing residues?
-   - If so, determine whether a structural modeling is needed.
-   - If missing residues are only on terminii of a chain, you can ignore them.
-     Optionally, you may cap the N- and C-terminus using acetyl and methylamide groups, respectively.
-   - If missing residues break a chain, you may need to model them using Modeller or Swiss-Model.
-     For short continuous missing residues (<5 aa), Modeller without additional template works well.
-     For long missing fragments, structural templates from homologs may be needed.
+    - If so, determine whether a structural modeling is needed.
+    - If missing residues are only on terminii of a chain, you can ignore them.
+      Optionally, you may cap the N- and C-terminus using acetyl and methylamide groups, respectively.
+    - If missing residues break a chain, you may need to model them using Modeller or Swiss-Model.
+      For short continuous missing residues (<5 aa), Modeller without additional template works well.
+      For long missing fragments, structural templates from homologs may be needed.
 
 * Any disulfide bonds?
-   - If so, keep in mind that additional modifications are needed for both PDB and tleap input file.
+    - If so, keep in mind that additional modifications are needed for both PDB and tleap input file.
 
 * Any essential post-translational modifications (phosphorylation, glycosylation, etc.)?
-   - If so, use proper force fields for the modified residues.
-   - For phosphorylated residues, use the files in this repository.
-   - For glycosylated residues, take a look of http://glycam.org.
+    - If so, use proper force fields for the modified residues.
+    - For phosphorylated residues, use the files in this repository.
+    - For glycosylated residues, take a look of http://glycam.org.
 
 * Any engineering mutations introduced only for expression or crystallization? 
-   - If so, may consider changing them back to wildtype.
+    - If so, may consider changing them back to wildtype.
 
 * Any molecules that require a force field out of Amber?
-   - Check the website, http://research.bmh.manchester.ac.uk/bryce/amber, which collects force field files
-     for a few commonly encountered cofactors, such as ATP, GTP, NADH, etc.
-   - Google, check Amber tutorials, or ask colleagues to see if there is a force field available.
-   - Use Antechamer to generate a force field (will need to load the GAFF force field in tleap).
-   - Optionally, may run Gaussian to generate partial charges.
+    - Check the website, http://research.bmh.manchester.ac.uk/bryce/amber, which collects force field files
+      for a few commonly encountered cofactors, such as ATP, GTP, NADH, etc.
+    - Google, check Amber tutorials, or ask colleagues to see if there is a force field available.
+    - Use Antechamer to generate a force field (will need to load the GAFF force field in tleap).
+    - Optionally, may run Gaussian to generate partial charges.
 
 ## Setup ##
 First, split the PDB file into protein, ligand, and water (we keep crystal water in case these
@@ -70,7 +70,12 @@ of PyMol because by it you can select different side-chain conformations.
 
 Make a working directory for a specific system and copy all related force field files, structure files (protein,
 ligand, and water), and the three '.in' files under it. Modify 'new_prep.in' to match your case (i.e. file names
-and options in tleap.in) and then run `./new_prep.in`.
+and options in tleap.in) and then run 
+
+```
+#!bash
+./new_prep.in
+```
 
 Check the 'prep/log' file to make sure there is no errors and significant warnings. Some warnings like 
 'WARNING: The unperturbed charge of the unit: 1.000000 is not zero.' can be ignored.
