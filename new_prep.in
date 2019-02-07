@@ -60,7 +60,7 @@ solvateoct apo TIP3PBOX 10.0 iso
 addions apo Na+ 0
 addions apo Cl- 0
 savepdb apo ${sys}_apo_box.pdb
-saveamberparm sys ${sys}_apo_box.prmtop ${sys}_apo_box.inpcrd
+saveamberparm apo ${sys}_apo_box.prmtop ${sys}_apo_box.inpcrd
 
 quit
 EOF
