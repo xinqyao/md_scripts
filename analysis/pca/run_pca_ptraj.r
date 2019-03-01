@@ -246,3 +246,53 @@ if(!is.null(avg)) {
    mktrj(pc, pc=1, pdb=avg, file="pc1.pdb")
    mktrj(pc, pc=2, pdb=avg, file="pc2.pdb")
 }
+
+## Time-series of PCs
+if(nrow(bounds) == 1) {
+   max.frame <- 10000   # max. # frames to plot
+   # time per frame (Unit: ns)
+   tpf <- 0.001
+
+   ## reduce plot if data points are too many
+   if(nrow(pc$z) > max.frame) {
+      fac <- ceiling(nrow(pc$z) / max.frame)
+      dat <- pc$z[seq(1, nrow(pc$z), fac), ]
+      tpf <- tpf * fac
+   }
+
+   ## pretty x-axis ticks
+   xx <- seq_along(dat[, 1]) * tpf
+   xunit <- "ns"
+   if(max(xx) > 1000) {
+      tpf <- tpf / 1000
+      xx <- xx / 1000
+      xunit <- "us"
+   } else if(max(xx) < 1) {
+      tpf <- tpf * 1000
+      xx <- xx * 1000
+      xunit <- "ps"
+   }
+   xticks <- pretty(xx, n=10)
+   
+   pdf(onefile=TRUE, file='ts-pcs.pdf', width=4, height=6)
+   layout(matrix(1:3, nrow=3, ncol=1))
+   par(mar=c(2,4,1,1))
+   plot(x=xx, y=dat[, 1], typ='l', col="black", xaxt="n",
+        xlab=paste("Time (", xunit, ")", sep=""),
+        ylab="PC1 (A)")
+   axis(1, at=xticks)
+
+   par(mar=c(2,4,1,1))
+   plot(x=xx, y=dat[, 2], typ='l', col="blue", xaxt="n",
+        xlab=paste("Time (", xunit, ")", sep=""),
+        ylab="PC2 (A)")
+   axis(1, at=xticks)
+
+   par(mar=c(4,4,1,1))
+   plot(x=xx, y=dat[, 3], typ='l', col="red", xaxt="n",
+        xlab=paste("Time (", xunit, ")", sep=""),
+        ylab="PC3 (A)")
+   axis(1, at=xticks)
+   dev.off()
+}
+
