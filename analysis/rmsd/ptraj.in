@@ -8,7 +8,7 @@ trajin ../../production.C.mdcrd
 #         #system res.
 center :1-XXX
 image center familiar
-rms reference out rms_bb.out :1-XXX@CA,C,N
+rms reference out rms_bb.out :1-XXX@CA,C,N,O
 #rms first out rms_lig1.out (:613-617)&(!@H=)
 #rms first out rms_lig2.out (:618-622)&(!@H=)
 #rms first out rms_sp_ww.out :7-34@CA,C,N

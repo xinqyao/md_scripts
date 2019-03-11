@@ -248,51 +248,75 @@ if(!is.null(avg)) {
 }
 
 ## Time-series of PCs
-if(nrow(bounds) == 1) {
-   max.frame <- 10000   # max. # frames to plot
-   # time per frame (Unit: ns)
-   tpf <- 0.001
+max.frame <- 10000   # max. # frames to plot
+# time per frame (Unit: ns)
+tpf <- 0.001
 
-   ## reduce plot if data points are too many
-   if(nrow(pc$z) > max.frame) {
-      fac <- ceiling(nrow(pc$z) / max.frame)
-      dat <- pc$z[seq(1, nrow(pc$z), fac), ]
-      tpf <- tpf * fac
-   }
+dat <- mclapply(1:nrow(bounds), function(i) {
+   pc$z[bounds[i, 1]:bounds[i, 2], ]
+}, mc.cores=ncore)
 
-   ## pretty x-axis ticks
-   xx <- seq_along(dat[, 1]) * tpf
-   xunit <- "ns"
-   if(max(xx) > 1000) {
-      tpf <- tpf / 1000
-      xx <- xx / 1000
-      xunit <- "us"
-   } else if(max(xx) < 1) {
-      tpf <- tpf * 1000
-      xx <- xx * 1000
-      xunit <- "ps"
-   }
-   xticks <- pretty(xx, n=10)
-   
-   pdf(onefile=TRUE, file='ts-pcs.pdf', width=4, height=6)
-   layout(matrix(1:3, nrow=3, ncol=1))
-   par(mar=c(2,4,1,1))
-   plot(x=xx, y=dat[, 1], typ='l', col="black", xaxt="n",
-        xlab=paste("Time (", xunit, ")", sep=""),
-        ylab="PC1 (A)")
-   axis(1, at=xticks)
+ll <- sapply(dat, nrow)
 
-   par(mar=c(2,4,1,1))
-   plot(x=xx, y=dat[, 2], typ='l', col="blue", xaxt="n",
-        xlab=paste("Time (", xunit, ")", sep=""),
-        ylab="PC2 (A)")
-   axis(1, at=xticks)
-
-   par(mar=c(4,4,1,1))
-   plot(x=xx, y=dat[, 3], typ='l', col="red", xaxt="n",
-        xlab=paste("Time (", xunit, ")", sep=""),
-        ylab="PC3 (A)")
-   axis(1, at=xticks)
-   dev.off()
+## reduce plot if data points are too many
+if(max(ll) > max.frame) {
+   fac <- ceiling(max(ll) / max.frame)
+   dat <- mclapply(dat, function(x) x[seq(1, nrow(x), fac), ], mc.cores=ncore)
+   tpf <- tpf * fac
 }
+
+## pretty x-axis ticks
+xx <- seq_along(dat[[which.max(ll)]][, 1]) * tpf
+xunit <- "ns"
+if(max(xx) > 1000) {
+   tpf <- tpf / 1000
+   xx <- xx / 1000
+   xunit <- "us"
+} else if(max(xx) < 1) {
+   tpf <- tpf * 1000
+   xx <- xx * 1000
+   xunit <- "ps"
+}
+xticks <- pretty(xx, n=10)
+
+pdf(onefile=TRUE, file='ts-pcs.pdf', width=4, height=6)
+layout(matrix(1:3, nrow=3, ncol=1))
+
+par(mar=c(2,4,1,1))
+plot(x=xx[1:nrow(dat[[1]])], y=dat[[1]][, 1], typ='l', col=col.line[1], xaxt="n",
+     xlim=range(xx), ylim=range(unlist(sapply(dat, "[", ,1))),
+     xlab=paste("Time (", xunit, ")", sep=""),
+     ylab="PC1 (A)")
+axis(1, at=xticks)
+if(length(dat) > 1) {
+   for(i in 2:length(dat)) {
+      lines(x=xx[1:nrow(dat[[i]])], y=dat[[i]][, 1], col=col.line[i])
+   }
+}
+
+par(mar=c(2,4,1,1))
+plot(x=xx[1:nrow(dat[[1]])], y=dat[[1]][, 2], typ='l', col=col.line[1], xaxt="n",
+     xlim=range(xx), ylim=range(unlist(sapply(dat, "[", ,2))),
+     xlab=paste("Time (", xunit, ")", sep=""),
+     ylab="PC2 (A)")
+axis(1, at=xticks)
+if(length(dat) > 1) {
+   for(i in 2:length(dat)) {
+      lines(x=xx[1:nrow(dat[[i]])], y=dat[[i]][, 2], col=col.line[i])
+   }
+}
+
+par(mar=c(4,4,1,1))
+plot(x=xx[1:nrow(dat[[1]])], y=dat[[1]][, 3], typ='l', col=col.line[1], xaxt="n",
+     xlim=range(xx), ylim=range(unlist(sapply(dat, "[", ,3))),
+     xlab=paste("Time (", xunit, ")", sep=""),
+     ylab="PC3 (A)")
+axis(1, at=xticks)
+if(length(dat) > 1) {
+   for(i in 2:length(dat)) {
+      lines(x=xx[1:nrow(dat[[i]])], y=dat[[i]][, 3], col=col.line[i])
+   }
+}
+
+dev.off()
 
