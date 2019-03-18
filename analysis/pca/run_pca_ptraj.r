@@ -95,6 +95,8 @@ discretize2d <-
 ######## START   CALCULATIONS #################
 
 ncore <- setup.ncore(ncore)
+vcov <- read.table('covar.dat')
+z <- read.table('project.dat')
 
 if(!is.null(pdbfiles)) {
    pdb.list <- mclapply(pdbfiles, read.pdb, mc.cores=ncore)
@@ -103,7 +105,7 @@ if(!is.null(pdbfiles)) {
 }
 
 if(is.null(bounds)) {
-   bounds <- matrix(1, nrow(z), ncol=2, byrow=TRUE)
+   bounds <- matrix(c(1, nrow(z)), ncol=2, byrow=TRUE)
 }
 
 if(!is.null(avgpdb)) {
@@ -117,8 +119,6 @@ if(length(col.traj) != nrow(bounds)) {
    stop("Colors do not match trajectories")
 }
 
-vcov <- read.table('covar.dat')
-z <- read.table('project.dat')
 pc <- mypca(S=vcov, z=as.matrix(z[, 2:4]), avg=as.vector(avg$xyz))
 rm(z, vcov)
 
