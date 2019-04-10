@@ -284,7 +284,7 @@ layout(matrix(1:3, nrow=3, ncol=1))
 
 par(mar=c(2,4,1,1))
 plot(x=xx[1:nrow(dat[[1]])], y=dat[[1]][, 1], typ='l', col=col.line[1], xaxt="n",
-     xlim=range(xx), ylim=range(unlist(sapply(dat, "[", ,1))),
+     xlim=range(xx), ylim=range(unlist(sapply(dat, function(x) x[, 1]))),
      xlab=paste("Time (", xunit, ")", sep=""),
      ylab="PC1 (A)")
 axis(1, at=xticks)
@@ -296,7 +296,7 @@ if(length(dat) > 1) {
 
 par(mar=c(2,4,1,1))
 plot(x=xx[1:nrow(dat[[1]])], y=dat[[1]][, 2], typ='l', col=col.line[1], xaxt="n",
-     xlim=range(xx), ylim=range(unlist(sapply(dat, "[", ,2))),
+     xlim=range(xx), ylim=range(unlist(sapply(dat, function(x) x[, 2]))),
      xlab=paste("Time (", xunit, ")", sep=""),
      ylab="PC2 (A)")
 axis(1, at=xticks)
@@ -308,7 +308,7 @@ if(length(dat) > 1) {
 
 par(mar=c(4,4,1,1))
 plot(x=xx[1:nrow(dat[[1]])], y=dat[[1]][, 3], typ='l', col=col.line[1], xaxt="n",
-     xlim=range(xx), ylim=range(unlist(sapply(dat, "[", ,3))),
+     xlim=range(xx), ylim=range(unlist(sapply(dat, function(x) x[, 3]))),
      xlab=paste("Time (", xunit, ")", sep=""),
      ylab="PC3 (A)")
 axis(1, at=xticks)
