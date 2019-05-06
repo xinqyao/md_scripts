@@ -131,7 +131,7 @@ for(i in 1:3) {
    myU[, i] <- as.numeric(unlist(strsplit(trimws(lines[myinds]), split="\\s+")))
 }
 chk <- round(t(pc$U[, 1:3]) %*% myU, 3)
-if(! (all(chk[upper.tri(chk)]==0) || all(abs(diag(chk))==1)) ) {
+if(! (all(chk[upper.tri(chk)]==0) && all(abs(diag(chk))==1)) ) {
    stop("Calculated eigenvectors do not match those obtained from cpptraj")
 }
 pc$U[, 1:3] <- t( t(pc$U[, 1:3]) * diag(chk) )
