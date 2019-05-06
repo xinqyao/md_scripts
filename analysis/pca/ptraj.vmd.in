@@ -1,0 +1,4 @@
+parm backbone_wt.prmtop
+readdata evecs.dat name Evecs
+runanalysis modes name Evecs trajout nag_mode2_pca.nc \
+  pcmin 15 pcmax 50 tmode 2 trajoutmask :1-497@CA,C,N,O trajoutfmt netcdf

@@ -1,0 +1,4 @@
+parm ../glu_wt_cpptraj.prmtop
+parmstrip !@CA,C,N,O
+parmwrite out backbone_wt.prmtop
+go
