@@ -13,6 +13,18 @@ ncore <- NULL
 ## Example: 
 ##   pdbfiles <- c('XXX', 'YYY', ... )
 pdbfiles <- NULL
+## Choose subset of pdbfiles to plot, if not all of them are to plot
+## pdb.ind <- c(1, 3)
+pdb.ind <- NULL
+## Colors of points representing the projected static pdb structures
+## pdb.col <- c("purple", "brown")
+pdb.col <- NULL
+## Shapes of points representing the projected static pdb structures
+## pdb.shape <- c(17, 19)
+pdb.shape <- NULL
+## Sizes of points representing the projected static pdb structures
+## pdb.size <- c(2, 2)
+pdb.size <- NULL
 
 ## Define boundaries of simulations; NULL means single trajectory
 ## Example:
@@ -215,10 +227,28 @@ if(contour) {
   }
 }
 inds <- which(sapply(rets, function(x) !is.null(x$myz)))
+if(!is.null(pdb.ind)) {
+   inds <- pdb.ind
+}
 if(length(inds)>0) {
    xx <- sapply(rets[inds], function(x) x$myz[1])
    yy <- sapply(rets[inds], function(x) x$myz[2])
-   p <- p + annotate("point", x=xx, y=yy, color=col.line[inds], size=0.5)
+   if(!is.null(pdb.col)) {
+      cols <- pdb.col
+   } else {
+      cols <- col.line[inds]
+   }
+   if(!is.null(pdb.shape)) {
+      shapes <- pdb.shape
+   } else {
+      shapes <- 19
+   }
+   if(!is.null(pdb.size)) {
+      sizes <- pdb.size
+   } else {
+      sizes <- 0.5
+   }
+   p <- p + annotate("point", x=xx, y=yy, color=cols, shape=shapes, size=sizes)
 }
 if(!is.null(myxlim)) {
    xlim <- myxlim
