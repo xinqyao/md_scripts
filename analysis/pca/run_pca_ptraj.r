@@ -9,7 +9,7 @@ breaks <- 120
 ## # cores to use; default=NULL means use all available cores
 ncore <- NULL
 
-## pdb files of initial conformations of simulations; NULL means ignore
+## pdb files of to project along with simulations; NULL means ignore
 ## Example: 
 ##   pdbfiles <- c('XXX', 'YYY', ... )
 pdbfiles <- NULL
@@ -186,24 +186,28 @@ rets <- mclapply(1:nrow(bounds), function(i) {
                     yy=yy[inds[, 2]], 
                     density=as.numeric(datab[datab>0]))
 
-   ## for annotation of initial conformations
-   if(!is.null(pdb.list)) {
-      pdb <- pdb.list[[i]]
-      pdb <- trim(pdb, "protein", elety=c("N", "CA", "C", "O"))  ## assume PCA is performed on mainchain
-      if(!is.null(avg)) {
-         myz <- project.pca(pdb$xyz, pc, fit=TRUE, 
-                            fixed.inds=1:ncol(pdb$xyz), mobile.inds=1:ncol(pdb$xyz))
-      } else {
-         warning("Average pdb file not provided. Annotation of initial conformations ignored")
-         myz <- NULL
-      }
-   } else {
-      myz <- NULL
-   }
-   list(ch=ch, dd=dd, myz=myz)
+   list(ch=ch, dd=dd)
 }, mc.cores=1)  ## has to be 1; otherwise, errors because of xspline() call!!
 dev.off()
    
+## for annotation of PDB conformations
+if(!is.null(pdb.list)) {
+   if(is.null(avg)) {
+      warning("Average pdb file not provided. Annotation of initial conformations ignored")
+      myz <- NULL
+   } else { 
+      myz <- lapply(pdb.list, function(pdb) {
+#   pdb <- pdb.list[[i]]
+         pdb <- trim(pdb, "protein", elety=c("N", "CA", "C", "O"))  ## assume PCA is performed on mainchain
+         project.pca(pdb$xyz, pc, fit=TRUE, 
+                     fixed.inds=1:ncol(pdb$xyz), mobile.inds=1:ncol(pdb$xyz))
+      } )
+   }
+} else {
+   myz <- NULL
+}
+
+
 ############ shaded area, contour lines, outlines, and annotated initial conformations (optional) ###########
 pdf(onefile=TRUE, file='pca.pdf', width=3, height=3)
 
@@ -226,30 +230,35 @@ if(contour) {
      }
   }
 }
-inds <- which(sapply(rets, function(x) !is.null(x$myz)))
-if(!is.null(pdb.ind)) {
-   inds <- pdb.ind
+
+if(!is.null(myz)) {
+   #inds <- which(sapply(rets, function(x) !is.null(x$myz)))
+   inds <- 1:length(myz)
+   if(!is.null(pdb.ind)) {
+      inds <- pdb.ind
+   }
+   if(length(inds)>0) {
+      xx <- sapply(myz[inds], "[", 1)
+      yy <- sapply(myz[inds], "[", 2)
+      if(!is.null(pdb.col)) {
+         cols <- pdb.col
+      } else {
+         cols <- col.line[inds]
+      }
+      if(!is.null(pdb.shape)) {
+         shapes <- pdb.shape
+      } else {
+         shapes <- 19
+      }
+      if(!is.null(pdb.size)) {
+         sizes <- pdb.size
+      } else {
+         sizes <- 0.5
+      }
+      p <- p + annotate("point", x=xx, y=yy, color=cols, shape=shapes, size=sizes)
+   }
 }
-if(length(inds)>0) {
-   xx <- sapply(rets[inds], function(x) x$myz[1])
-   yy <- sapply(rets[inds], function(x) x$myz[2])
-   if(!is.null(pdb.col)) {
-      cols <- pdb.col
-   } else {
-      cols <- col.line[inds]
-   }
-   if(!is.null(pdb.shape)) {
-      shapes <- pdb.shape
-   } else {
-      shapes <- 19
-   }
-   if(!is.null(pdb.size)) {
-      sizes <- pdb.size
-   } else {
-      sizes <- 0.5
-   }
-   p <- p + annotate("point", x=xx, y=yy, color=cols, shape=shapes, size=sizes)
-}
+
 if(!is.null(myxlim)) {
    xlim <- myxlim
 }
