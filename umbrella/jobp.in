@@ -1,0 +1,36 @@
+#!/bin/csh
+
+#First four lines are for AMBER14 single gpu usage, next four lines are for AMBER14 with dual gpu usage. Next four are for AMBER16 single gpu usage, last four are for AMBER16 dual gpu usage. Comment out accordingly.
+
+#setenv CUDA_HOME /usr/local/cuda-6.5
+#setenv LD_LIBRARY_PATH "/usr/local/cuda-6.5/lib64:${LD_LIBRARY_PATH}"
+#setenv PATH "/usr/local/cuda-6.5/bin:${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0"
+
+#setenv CUDA_HOME /usr/local/cuda-6.5
+#setenv LD_LIBRARY_PATH "/usr/local/cuda-6.5/lib64:/software/openmpi.1.8.1/lib:${LD_LIBRARY_PATH}"
+#setenv PATH "/usr/local/cuda-6.5/bin:${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0,1"
+
+#setenv CUDA_HOME /software/usr/cuda-7.5
+#setenv LD_LIBRARY_PATH "/software/usr/cuda-7.5/lib64:${LD_LIBRARY_PATH}"
+#setenv PATH "/software/usr/cuda-7.5/bin:${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "1"
+
+#setenv CUDA_HOME /software/usr/cuda-7.5
+#setenv LD_LIBRARY_PATH "/software/usr/cuda-7.5/lib64:/software/openmpi.1.8.1/lib:${LD_LIBRARY_PATH}"
+#setenv PATH "/software/usr/cuda-7.5/bin:${PATH}"
+#setenv CUDA_VISIBLE_DEVICES "0,1"
+
+setenv CUDA_HOME /software/usr/cuda-8.0
+setenv LD_LIBRARY_PATH /software/usr/cuda-8.0/lib64:/usr/lib64/openmpi/lib/:${LD_LIBRARY_PATH}
+setenv PATH "/software/usr/cuda-8.0/bin:${PATH}"
+setenv CUDA_VISIBLE_DEVICES "1"
+
+set prv=0
+
+foreach cur (A)
+  pmemd.cuda -O -i equil.in -p ../ts_box.prmtop -c production.$prv.restrt -o production.$cur.out -r production.$cur.restrt -x production.$cur.mdcrd 
+
+  set prv=$cur
+end

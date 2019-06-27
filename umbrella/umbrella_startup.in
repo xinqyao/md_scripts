@@ -1,0 +1,24 @@
+#!/bin/csh
+
+foreach cur (10 20 30 40 50 60 70 80 90)
+set l=0
+set r=0
+
+mkdir umbrella_$cur
+cd umbrella_$cur
+cp ../jobp.in .
+cp ../equil.in .
+
+ @ l = -180 + $cur
+ @ r = 180 + $cur
+
+cat > noe.in <<EOF
+# angle
+  &rst
+     ixpk= 0, nxpk= 0, iat=2554, 2558, 2560, 2569, r1=$l, r2=$cur, r3=$cur, r4=$r,
+         rk2=200.0, rk3=200.0, ir6=1, ialtd=0,
+         /
+         
+EOF
+cd ../
+end

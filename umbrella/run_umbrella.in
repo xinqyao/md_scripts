@@ -1,0 +1,11 @@
+#!/bin/csh
+
+foreach cur (10 20 30 40 50 60 70 80 90)
+@ prv = $cur - 10
+
+cd umbrella_$cur/
+cp ../umbrella_$prv/production.A.restrt production.0.restrt
+./jobp.in >& err.log
+cd ../
+
+end
