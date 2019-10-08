@@ -284,6 +284,9 @@ dev.off()
 if(!is.null(avg)) {
    mktrj(pc, pc=1, pdb=avg, file="pc1.pdb")
    mktrj(pc, pc=2, pdb=avg, file="pc2.pdb")
+   source("vmd.modes.R")
+   vmd.modes(pc, mode=1, pdb=avg, file="pc1_arrow.vmd")
+   vmd.modes(pc, mode=2, pdb=avg, file="pc2_arrow.vmd")
 }
 
 ## Time-series of PCs
