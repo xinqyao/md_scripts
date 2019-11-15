@@ -1,0 +1,29 @@
+#!/bin/bash
+
+num_frames=12000
+num_cores=10
+
+modulo=$((num_frames%num_cores))
+first_iteration=$((num_cores-modulo))
+increment=$(((num_frames-modulo)/num_cores))
+
+start_frame=1
+end_frame=$increment
+
+qsub_in () {
+    for i in `seq $1 $2`;do
+        mkdir ligand/ligand$i
+        cd ligand/ligand$i
+        nohup sh ../../ligand.sh $start_frame $end_frame &
+        cd ../..
+#        echo $i, $start_frame, $end_frame, $increment
+        ((start_frame+=$increment))
+        ((end_frame+=$increment))
+    done
+    increment=$((increment+1))
+    first_iteration=$((first_iteration+1))
+    end_frame=$((end_frame+=1))
+}
+
+qsub_in 1 $first_iteration
+qsub_in $first_iteration $num_cores
