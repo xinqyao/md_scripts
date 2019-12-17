@@ -1,0 +1,10 @@
+parm ../../../prep/Rcatcher_lig_nowat.prmtop
+trajin ../../production.[0-9]*.mdcrd
+
+#         #system res.
+center :1-217
+image center familiar
+hbond HBdonor out ch6_as_donor.out :1-61,63-217 donormask :62@N=,O= avgout ch6_as_donor.avgout series uuseries ch6_donor_detail.out
+hbond HBacceptor out ch6_as_acceptor.out :1-61,63-217 acceptormask :62@N=,O= avgout ch6_as_acceptor.avgout series uuseries ch6_acceptor_detail.out
+
+go

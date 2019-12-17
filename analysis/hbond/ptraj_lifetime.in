@@ -1,0 +1,6 @@
+readdata ch6_acceptor_detail.out name HB
+lifetime HB out lifetime_ch6_as_acceptor.dat
+lifetime HB out window/lifetime_ch6_as_acceptor.dat window 100000
+
+go
+

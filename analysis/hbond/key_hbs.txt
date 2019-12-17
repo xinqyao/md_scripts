@@ -1,0 +1,8 @@
+# (Combined) freq >= XX% in either direct or water bridged HB
+ID                          Bridged
+LYS_64                      FALSE
+TRP_87                      FALSE
+ARG_89                      FALSE
+SER_140                     FALSE
+GLH_209                     FALSE
+LEU_193                     TRUE
