@@ -6,19 +6,20 @@ vmd.pca <- function(...)
 
 vmd.modes <- function(modes, mode=NULL, pdb=NULL, file=NULL, scale=50, dual=FALSE,
                       color=c('red', 'green', 'blue'), ca.only=FALSE,
-                      type="script", exefile = "vmd", ...) {
+                      type=c("script", "launch"), exefile = "vmd", ...) {
 
   if(!( (inherits(modes, "nma") || inherits(modes,"pca")) ))
     stop("must supply a 'nma' or 'pca' object, i.e. from 'nma()' or 'pca.xyz()'")
  
   color <- match.arg(color)
  
-  allowed <- c("script", "launch")
-  if(!type %in% allowed) {
-    stop(paste("input argument 'type' must be either of:",
-               paste(allowed, collapse=", ")))
-  }
-    
+#  allowed <- c("script", "launch")
+#  if(!type %in% allowed) {
+#    stop(paste("input argument 'type' must be either of:",
+#               paste(allowed, collapse=", ")))
+#  }
+  type <- match.arg(type)
+  
   ## Check if the program is executable
   if(type %in% c("launch")) {
       
@@ -62,20 +63,27 @@ vmd.modes <- function(modes, mode=NULL, pdb=NULL, file=NULL, scale=50, dual=FALS
   ## calc all vec lengths (for coloring later)
   all.lens <- apply(mode.vecs, 1, function(x) sqrt(sum(x**2)))
 
-  ## output file name
-  if(is.null(file)) {
-    if(type=="script")
-      file <- "R.vmd"
-  }
-  
   ## use temp-dir unless we output a VMD script
-  if(type %in% c("launch"))
+  if(type == "launch") {
     tdir <- tempdir()
-  else
+  } else {
     tdir <- "."
+  }
 
   vmdfile <- tempfile(tmpdir=tdir, fileext=".vmd")
   pdbfile <- tempfile(tmpdir=tdir, fileext=".pdb")
+
+  ## output file name
+  if(is.null(file)) {
+    if(type == "script") {
+      file <- "R.vmd"
+      pdbfile <- "R.pdb"
+    }
+  } else {
+    if(type == "script") {
+      pdbfile <- paste(sub("\\.vmd$", "", file), ".pdb", sep="")
+    }
+  } 
   
   ## start building VMD script
   scr <- c("proc vmd_draw_arrow {mol start end} {

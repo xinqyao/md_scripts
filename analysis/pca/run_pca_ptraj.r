@@ -19,6 +19,9 @@ pdb.ind <- NULL
 ## Colors of points representing the projected static pdb structures
 ## pdb.col <- c("purple", "brown")
 pdb.col <- NULL
+## Filling colors of points representing the projected static pdb structures
+## pdb.fill <- c("purple", "brown")
+pdb.fill <- NULL
 ## Shapes of points representing the projected static pdb structures
 ## pdb.shape <- c(17, 19)
 pdb.shape <- NULL
@@ -245,6 +248,11 @@ if(!is.null(myz)) {
       } else {
          cols <- col.line[inds]
       }
+      if(!is.null(pdb.fill)) {
+         fills <- pdb.fill
+      } else {
+         fills <- col.line[inds]
+      }
       if(!is.null(pdb.shape)) {
          shapes <- pdb.shape
       } else {
@@ -255,7 +263,7 @@ if(!is.null(myz)) {
       } else {
          sizes <- 0.5
       }
-      p <- p + annotate("point", x=xx, y=yy, color=cols, shape=shapes, size=sizes)
+      p <- p + annotate("point", x=xx, y=yy, color=cols, fill=fills, shape=shapes, size=sizes)
    }
 }
 
