@@ -4,14 +4,17 @@ vmd.nma <- function(...)
 vmd.pca <- function(...)
   vmd.modes(...)
 
-vmd.modes <- function(modes, mode=NULL, pdb=NULL, file=NULL, scale=50, dual=FALSE,
-                      color=c('red', 'green', 'blue'), ca.only=FALSE,
+vmd.modes <- function(modes, mode=NULL, pdb=NULL, file=NULL, mag=5, 
+                      dual=FALSE, cut=1.0, 
+                      color=c('red', 'green', 'blue'), 
+                      color.map=c("scaled", "linear"), ca.only=FALSE,
                       type=c("script", "launch"), exefile = "vmd", ...) {
 
   if(!( (inherits(modes, "nma") || inherits(modes,"pca")) ))
     stop("must supply a 'nma' or 'pca' object, i.e. from 'nma()' or 'pca.xyz()'")
  
   color <- match.arg(color)
+  color.map <- match.arg(color.map)
  
 #  allowed <- c("script", "launch")
 #  if(!type %in% allowed) {
@@ -48,6 +51,7 @@ vmd.modes <- function(modes, mode=NULL, pdb=NULL, file=NULL, scale=50, dual=FALS
     xyz <- modes$mean
     mode.vecs <- matrix(modes$U[,mode], ncol=3, byrow=T)
   }
+  mode.L <- modes$L[mode]
 
   xyz0 <- xyz 
   if(ca.only && !is.null(pdb)) {
@@ -92,9 +96,14 @@ vmd.modes <- function(modes, mode=NULL, pdb=NULL, file=NULL, scale=50, dual=FALS
    graphics $mol cylinder $start $middle radius 0.15
    graphics $mol cone $middle $end radius 0.25
 }")
-  scr <- c(scr, paste("mol new ", 
-    normalizePath(pdbfile, winslash='/', mustWork=FALSE),
-    " type pdb", sep=""))
+  if(type == "script") {
+     scr <- c(scr, paste("mol new ", pdbfile, " type pdb", sep=""))
+  }
+  else {
+     scr <- c(scr, paste("mol new ", 
+       normalizePath(pdbfile, winslash='/', mustWork=FALSE),
+       " type pdb", sep=""))
+  }
   scr <- c(scr, "mol delrep 0 top
 mol representation NewCartoon
 mol color ColorID 8
@@ -121,11 +130,18 @@ for {set i 0} {$i < 1024} {incr i} {
 #  w.body <- 0.15; w.head <- 0.2
 
   for ( i in 1:nrow(mode.vecs)) {
+    if(all.lens[i]*sqrt(mode.L)*mag < cut) next
+
     inds    <- atom2xyz(i) 
     coords  <- xyz[inds]
     
-    ## For coloring (longest vec has length=1)
-    tmp.len <- (sqrt(sum(mode.vecs[i,]**2))-min(all.lens)) / max(all.lens)
+    ## For color mapping
+    tmp.len <- switch(color.map, 
+       "linear" = 
+          #(longest vec has length=1)
+          (all.lens[i] - min(all.lens)) / (max(all.lens) - min(all.lens)),
+       "scaled" = (all.lens[i] - mean(all.lens)) / sd(all.lens)
+    )
 
     if(tmp.len>1) {
       tmp.len <- 1
@@ -137,7 +153,7 @@ for {set i 0} {$i < 1024} {incr i} {
     col <- round(tmp.len * 1023, 0)
  
     ## Main vector
-    tmp.vec <- mode.vecs[i,] * scale
+    tmp.vec <- mode.vecs[i,] * sqrt(mode.L) * mag
     
 #    ## For arrow head
 #    if(sqrt(sum(tmp.vec**2))<1)
