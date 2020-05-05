@@ -5,9 +5,11 @@ trajin ../../production.B.mdcrd
 trajin ../../production.C.mdcrd
 #...
 
-#         #system res.
-center :1-XXX
+#       #YYY: protein res.
+#       #XXX: system res.
+center :1-YYY
 image center familiar
+
 rms reference out rms_bb.out :1-XXX@CA,C,N,O
 #rms first out rms_lig1.out (:613-617)&(!@H=)
 #rms first out rms_lig2.out (:618-622)&(!@H=)

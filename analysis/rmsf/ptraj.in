@@ -3,9 +3,19 @@ trajin ../../production.A.mdcrd
 trajin ../../production.B.mdcrd
 # ...
 
+#       #YYY: protein res.
+#       #XXX: system res.
+center :1-YYY
+image center familiar
+
 rms first :1-XXX@CA,C,N,O
 average crdset RefAvg :1-XXX@CA,C,N,O
 run
+
+#       #YYY: protein res.
+#       #XXX: system res.
+center :1-YYY
+image center familiar
 rms ref RefAvg :1-XXX@CA,C,N,O
 
 atomicfluct out rmsf.txt :1-XXX@CA,C,N,O byres

@@ -7,11 +7,20 @@ trajin ../../production.[CDE].mdcrd parm [top_wt]
 trajin ../../../../MUTANT/production/production.[CDE].mdcrd parm [top_mt]
 # ...
 
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
 #              # protein res.
 #rms reference :1-XXX@CA,C,N,O
 rms first :1-XXX@CA,C,N,O
 average crdset RefAvg :1-XXX@CA,C,N,O
 run
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
 rms ref RefAvg :1-XXX@CA,C,N,O
 average avg.pdb :1-XXX@CA,C,N,O
 
@@ -19,6 +28,10 @@ matrix name matc covar out covar.dat :1-XXX@CA,C,N,O
 diagmatrix matc out evecs.dat name diagmodes vecs 10
 run
 
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
 rms ref RefAvg :1-XXX@CA,C,N,O
 projection evecs diagmodes out project.dat beg 1 end 3 :1-XXX@CA,C,N,O
 go
