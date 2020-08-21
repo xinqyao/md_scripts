@@ -140,9 +140,17 @@ rm(z, vcov)
 # check signs of eigenvectors
 lines <- readLines('evecs.dat')
 inds <- which(lines == " ****")
+if(length(inds) < 3) {
+   stop("At least 3 eigenvectors must be generated")
+}
 myU <- matrix(NA, nrow=nrow(pc$U), ncol=3)
 for(i in 1:3) {
-   myinds <- c((inds[i]+2) : (inds[i+1]-1))
+   if(length(inds) == 3 && i == 3) {
+      myinds <- c((inds[i]+2) : length(lines))
+   }
+   else {
+      myinds <- c((inds[i]+2) : (inds[i+1]-1))
+   }
    myU[, i] <- as.numeric(unlist(strsplit(trimws(lines[myinds]), split="\\s+")))
 }
 chk <- round(t(pc$U[, 1:3]) %*% myU, 3)
