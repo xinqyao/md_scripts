@@ -1,0 +1,18 @@
+parm ../../XXX_nowat.prmtop [top]
+parm avg.pdb [ref]
+reference avg.pdb parm [ref]
+
+trajin ../../production.[CDE].mdcrd parm [top]
+# ...
+
+strip !:X-XXX
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
+rms reference :1-XXX@CA,C,N,O
+
+projection evecs evecs.dat out project.dat beg 1 end 3 :1-XXX@CA,C,N,O
+
+go

@@ -1,0 +1,45 @@
+parm ../../XXX_nowat.prmtop [sys]
+
+## all trajectory should use the same reference
+parm ../../../prep/XXX_nowat.pdb [ref]
+
+reference ../../../prep/XXX_nowat.pdb parm [ref]
+trajin ../../production.[CDE].mdcrd parm [sys]
+# ...
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
+#              # protein res.
+rms reference :1-XXX@CA,C,N,O
+average crdset RefAvg :1-XXX@CA,C,N,O
+run
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
+rms ref RefAvg :1-XXX@CA,C,N,O
+average avg.pdb :1-XXX@CA,C,N,O
+
+matrix name matc covar out covar.dat :1-XXX@CA,C,N,O
+diagmatrix matc out evecs.dat name diagmodes vecs 4
+run
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-YYY
+image center familiar
+rms ref RefAvg :1-XXX@CA,C,N,O
+projection evecs diagmodes out project.dat beg 1 end 3 :1-XXX@CA,C,N,O
+go
+
+#rms ref RefAvg :1-612@CA,C,N,O
+#rms first out rms.out :1-612@CA,C,N
+#matrix name matc covar out covar.dat :1-612@CA,C,N 
+#diagmatrix matc out evecs.dat name diagmodes vecs 10
+#run
+#rms first out rms.out :1-612@CA,C,N
+#projection evecs evecs.dat out project.dat beg 1 end 3 :1-612@CA,C,N
+#go
