@@ -1,41 +1,39 @@
 library(bio3d)
 
 ## Define number of frames for all simulations included
-N <- c(10^6, 2*10^6) #...
+N <- c(10^5, 10^6) #...
 
-## data from the first simulation PCA
-avg1 <- read.pdb("XXX/analysis/pca/avg.pdb")
-cov1 <- read.table("XXX/analysis/pca/covar.dat")
+## Define file names of average PDB
+favg <- c("XXX/analysis/pca/avg.pdb", "YYY/analysis/pca/avg.pdb") #...
 
-## data from the second simulation PCA
-avg2 <- read.pdb("YYY/analysis/pca/avg.pdb")
-cov2 <- read.table("YYY/analysis/pca/covar.dat")
+## Define file names of covariance matrix
+fcov <- c("XXX/analysis/pca/covar.dat", "YYY/analysis/pca/covar.dat") #...
 
-## data from more simulation PCA if included...
-# avg3 <- read.pdb("ZZZ/analysis/pca/avg.pdb")
-# cov3 <- read.table("ZZZ/analysis/pca/covar.dat")
-# ...
 
-xyz <- rbind(avg1$xyz, avg2$xyz) # ...
+############ !! DO NOT CHANGE FOLLOWING LINES !! ####################
+
+avgs <- lapply(favg, read.pdb)
+covs <- lapply(fcov, read.table)
+
+# new average structure
+xyz <- do.call("rbind", lapply(avgs, "[[", "xyz"))
 xyz <- as.xyz( colMeans(xyz) )
 
-write.pdb(pdb=avg1, xyz=xyz, file="avg.pdb")
+write.pdb(pdb=avgs[[1]], xyz=xyz, file="avg.pdb")
 
-
-xy1 <- t(avg1$xyz) %*% avg1$xyz
-xy2 <- t(avg2$xyz) %*% avg2$xyz
-# ...
+xys <- lapply(avgs, function(x) {
+   t(x$xyz) %*% x$xyz
+})
 
 xy <- t(xyz) %*% xyz
 
-## adapt following for more simulations
-out <- (N[1]-1) / N[1] * cov1 +
-       (N[2]-1) / N[2] * cov2 +
-       xy1 + xy2 - 2*xy
+out <- matrix(0, nrow = nrow(covs[[1]]), ncol = ncol(covs[[2]]))
+for(i in 1:length(N)) {
+   out <- out + (N[i]-1) / N[i] * covs[[i]] + xys[[i]] - xy
+}
+out <- as.matrix( out / (length(N) * (sum(N)-1) / sum(N)) )
 
-out <- as.matrix( out / (2 * (sum(N)-1) / sum(N)) )
-
-write(format(round(out, 3), scientific=FALSE, justify="right", nsmall=3), file="covar.dat", ncolumns=ncol(cov1))
+write(format(round(out, 3), scientific=FALSE, justify="right", nsmall=3), file="covar.dat", ncolumns=ncol(out))
 
 ## Diagonalize matrix and write out results
 avg <- xyz
