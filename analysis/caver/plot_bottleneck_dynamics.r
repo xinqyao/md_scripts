@@ -1,5 +1,6 @@
 library(bio3d)
 library(ggplot2)
+library(plyr)
 source("myplot.r")
 
 n <- 3   ## The number of tunnels to check for each system (simulation)
@@ -13,7 +14,7 @@ for(i in 1:length(files)) {
    dat <- as.matrix(read.csv(files[i], header=FALSE, sep=","))
    dat <- dat[, -ncol(dat)]
    dat <- dat[c(1:n), ]
-   data <- rbind(data, dat)
+   data <- rbind.fill.matrix(data, dat)
 }
 
 
