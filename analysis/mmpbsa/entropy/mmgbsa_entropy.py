@@ -93,7 +93,7 @@ del argparse
 #ids ref_dG.keys()
 #del dat, F
 
-ids = ['sys1']
+ids = ['cis', 'trans', 'ts']
 
 #############
 # Load data #
@@ -435,9 +435,9 @@ for id in ids:
             dG[id]['%s_no_rw_xi'%solvent] = \
                 estimate_dG(Psi, nm_TdS) + dG_xi
             # With ligand confinement free energy
-            dG[id]['%s_no_rw_c'%solvent] = \
-                estimate_dG(Psi[(Psi.shape[0] - U_c.shape[0]):], nm_TdS, \
-                U_c) + dG_c
+#            dG[id]['%s_no_rw_c'%solvent] = \
+#                estimate_dG(Psi[(Psi.shape[0] - U_c.shape[0]):], nm_TdS, \
+#                U_c) + dG_c
 #            dG[id]['%s_no_rw_%.2f_xi'%(solvent, rmsd_filter)] = \
 #                estimate_dG(Psi, nm_TdS) + dG_xi
 #            dG[id]['%s_rw_%.2f_xi'%(solvent, rmsd_filter)] = \
@@ -450,7 +450,8 @@ for id in ids:
 #                estimate_dG(Psi[(Psi.shape[0] - U_c.shape[0]):], nm_TdS, \
 #                DeltaU[(Psi.shape[0] - U_c.shape[0]):] + U_c) + dG_c
 
-for confinement in ['o','xi','c']:
+#for confinement in ['o','xi','c']:
+for confinement in ['o','xi']:
 #    key = 'GBSA_no_rw_%.2f_%s'%(rmsd_filters[0], confinement)
     key = 'GBSA_no_rw_%s'%confinement
     print 'Free energies for '+key
