@@ -1,8 +1,9 @@
-library(ggplot2)
-cis <- read.table('../MMPBSA_p151_cis.mmpbsa')
-ts <- read.table('../MMPBSA_p151_ts.mmpbsa')
-trans <- read.table('../MMPBSA_p151_trans.mmpbsa')
-state <- rep(c("cis", "ts", "trans"), c(nrow(cis), nrow(ts), nrow(trans)))
+#library(ggplot2)
+RL <- read.table('sample/sys1/PBSA_RL.dat')
+R <- read.table('sample/sys1/PBSA_R.dat')
+L <- read.table('sample/sys1/PBSA_L.dat')
+
+ene <- RL - R - L
 
 ##
 kb = 0.0019872041
@@ -12,38 +13,37 @@ temp = 300
 dgc <- -kb*temp * log((6.022*10^-4)/(8 * pi**2))
 
 ## entropy change up to 2nd order
-s2.cis  <- 1/(2*kb*temp)*var(cis[, 1])
-s2.ts <- 1/(2*kb*temp)*var(ts[, 1])
-s2.trans  <- 1/(2*kb*temp)*var(trans[, 1])
+s2 <- 1/(2*kb*temp)*var(ene[, 1])
 
 ## entropy change up to 3rd order
-s3.cis  <- 1/(3*2*(kb*temp)**2)*colMeans((cis - colMeans(cis))**3)
-s3.ts <- 1/(3*2*(kb*temp)**2)*colMeans((ts - colMeans(ts))**3)
-s3.trans <- 1/(3*2*(kb*temp)**2)*colMeans((trans - colMeans(trans))**3)
+s3 <- 1/(3*2*(kb*temp)**2)*colMeans((ene - colMeans(ene))**3)
 
 ## Binding free energy up to 2nd order entropy
-dg2.cis <- cis + s2.cis + dgc
-dg2.ts <- ts + s2.ts + dgc
-dg2.trans <- trans + s2.trans + dgc
+dg2 <- ene + s2 + dgc
 
 ## Binding free energy up to 3rd order entropy
-dg3.cis <- dg2.cis + s3.cis
-dg3.ts <- dg2.ts + s3.ts
-dg3.trans <- dg2.trans + s3.trans
+dg3 <- dg2 + s3
 
-dat2 <- cbind(deltaG=rbind(dg2.cis, dg2.ts, dg2.trans), state=state)
-colnames(dat2)[1] <- "energy"
+cat("Mean binding free energy:\n")
+colMeans(ene)
+cat("\n")
 
-pdf(onefile=TRUE, file="pbsa_2nd_entropy.pdf", width=5, height=4)
-p <- ggplot(dat2, aes(x=energy, col=state)) + geom_line(stat="density")
-print(p)
-dev.off()
+cat("Mean binding free energy + confinement:\n")
+colMeans(ene + dgc)
+cat("\n")
 
+cat("Mean binding free energy + 2nd entropy:\n")
+colMeans(ene+s2)
+cat("\n")
 
-dat3 <- cbind(deltaG=rbind(dg3.cis, dg3.ts, dg3.trans), state=state)
-colnames(dat3)[1] <- "energy"
+cat("Mean binding free energy + 2nd entropy + confinement:\n")
+colMeans(ene+s2+dgc)
+cat("\n")
 
-pdf(onefile=TRUE, file="pbsa_3rd_entropy.pdf", width=5, height=4)
-p <- ggplot(dat3, aes(x=energy, col=state)) + geom_line(stat="density")
-print(p)
-dev.off()
+cat("Mean binding free energy + 3rd entropy:\n")
+colMeans(ene+s2+s3)
+cat("\n")
+
+cat("Mean binding free energy + 3rd entropy + confinement:\n")
+colMeans(ene+s2+s3+dgc)
+cat("\n")
