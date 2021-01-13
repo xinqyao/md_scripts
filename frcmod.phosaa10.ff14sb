@@ -65,6 +65,7 @@ CT-OZ-P         100.0   120.50
 2C-OZ-P         100.0   120.50  # copy from above but match ff14sb atom type
 3C-OZ-P         100.0   120.50  # copy from above but match ff14sb atom type
 CT-CT-OZ        50.0    109.50  
+CT-3C-OZ        50.0    109.50  # copy from above but match ff14sb atom type
 CX-2C-OZ        50.0    109.50  # copy from above but match ff14sb atom type
 CX-3C-OZ        50.0    109.50  # copy from above but match ff14sb atom type
 H1-CT-OZ        50.0    109.50  
@@ -86,6 +87,7 @@ X -C -OZ-X      2       5.40    180.0   2.
 X -CT-OZ-X      3       1.15    0.0     3.      
 X -2C-OZ-X      3       1.15    0.0     3.      # copy from above but match ff14sb atom type
 X -3C-OZ-X      3       1.15    0.0     3.      # copy from above but match ff14sb atom type
+X -CT-3C-X      9       1.40    0.0     3.      JCC,7,(1986),230 (was X -CT-CT-X )
 
 IMPR
 
