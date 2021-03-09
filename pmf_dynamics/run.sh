@@ -2,11 +2,12 @@
 #module load pdb2pqr
 #module load pymol/1.8.6
 
-#mkdir prep
+mkdir prep
 mkdir equil
-#mkdir windows
-#mkdir us
-#mkdir dynamics
+mkdir windows
+mkdir us
+mkdir dynamics
+mkdir dynamics_cis
 
 cd prep
 
@@ -51,6 +52,9 @@ quit
 EOF
 tleap -f tleap.in &> log
 
+## check log file carefully !!
+less log
+
 cd ..
 
 #cp /software/md_scripts_hamelberglab/new_equil.in .
@@ -59,13 +63,31 @@ cd ..
 vi new_equil.in
 ./new_equil.in
 
+cd equil
+nohup ./jobe.in &> err.log &
+
+
+cd ..
+
 cd windows
 cp /software/md_scripts_hamelberglab/umbrella/*.in ./
 sed 's/8.33250000E+00/3.50000000E+00/' ../prep/ffspr_box.prmtop > ./ffspr_box.prmtop
+
 ## modify scripts
 vi equil.in
+vi jobp.in
+
+# modify noe.in generation: CA-O-CD-CA
+vi umbrella_startup.in
+
 #...
+
 ./umbrella_startup.in
+
+
+# modify run_umbrella.in (e.g., because in enzyme it starts with "cis" (0 degree))
+vi run_umbrella.in
+nohup ./run_umbrella.in &> err.log &
 
 cd ..
 

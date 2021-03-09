@@ -3,12 +3,14 @@
 export LD_LIBRARY_PATH=/software/usr/cuda-8.0/lib64:/usr/lib64/openmpi/lib/:${LD_LIBRARY_PATH}
 export CUDA_VISIBLE_DEVICES="0"
 
+sys=ffpspr_box
+
 for ((rnum=1; rnum<=30; rnum++)); do
    for direc in 2.8 3.5 4.2 4.9 5.6; do
       if ! test -r $direc; then
          mkdir $direc
          tt=$( echo $direc | awk '{printf "%.8E", $1/4}' )
-         sed "s/8.33250000E+00/$tt/" ../prep/ffspr_box.prmtop > $direc/ffspr_box.prmtop
+         sed "s/8.33250000E+00/$tt/" ../prep/${sys}.prmtop > $direc/${sys}.prmtop
       fi
       cd $direc
 
@@ -82,7 +84,7 @@ EOF
  
          cp production.${f}.restrt production.run.restrt
 
-         pmemd.cuda -O -i production.in -p ffspr_box.prmtop -c production.run.restrt -o production.${f}.out -r production.${f}.restrt
+         pmemd.cuda -O -i production.in -p ${sys}.prmtop -c production.run.restrt -o production.${f}.out -r production.${f}.restrt
 
          sleep 5
 
@@ -97,7 +99,7 @@ EOF
       for ifile in ../ang.[-0-9]*.out; do
          awk '{a=$2; if(a<-60) a=a+360; if(a>300) a=a-360; print $1, a}' $ifile > tmp/$(basename $ifile)
       done
-      /software/wham/wham/wham P -60 300 100 0.000001 300.0 0 metafile pmf.out &> err.log
+      /software/wham/wham/wham P -60 300 100 0.000001 300.0 0 metafile pmf.out 10 1234 &> err.log
       awk 'NR > 1 && NR <102{print $1,$2}' pmf.out > fep.${rnum}.out
       cd ..
       cd ..
