@@ -1,0 +1,3 @@
+dca.m is the original DCA (Matlab) program provided by the authors of the method.
+dca.R is a R version of the original program. It produces exactly the same result of dca.m
+
