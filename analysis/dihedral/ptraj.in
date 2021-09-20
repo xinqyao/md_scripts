@@ -1,0 +1,6 @@
+parm /userdata1/jvu/cyclophilin/cypa_cis/cypa_cis_nowat.prmtop
+trajin /userdata1/jvu/cyclophilin/cypa_cis/production.[A-Z]*.mdcrd
+
+#multidihedral dihtype myomega:CA:O:CD:CA resrange 169-170 out dih.txt
+dihedral :169@CA :169@O :170@CD :170@CA out dih.txt
+go
