@@ -1,0 +1,51 @@
+parm XXX/wt_apo_nowat.prmtop [sys]
+
+## all trajectory should use the same reference
+parm XXX/wt_apo_nowat.prmtop [ref]
+
+reference XXX/wt_apo_nowat.pdb parm [ref]
+trajin XXX/production.*.mdcrd 1 last 100 parm [sys]
+#trajin /userdata1/xinqyao/CaSR_ECD/apo/production/production.01[0-9].mdcrd 1 last 100 parm [sys]
+#trajin /userdata1/xinqyao/CaSR_ECD/apo/production/production.02[0-1].mdcrd 1 last 100 parm [sys]
+# ...
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+center :1-XXX
+image center familiar
+#              # protein res.
+rms reference :YYY@CA,C,N,O
+#average crdset RefAvg :1-1031@CA,C,N,O
+#run
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+#center :1-1031
+#image center familiar
+#rms ref RefAvg :3-101,117-340,372-509,523-621,637-860,892-1029@CA,C,N,O
+average avg.pdb :YYY@CA,C,N,O
+average avg_full.pdb :1-XXX@CA,C,N,O
+#average avg_ca.pdb :1-1033@CA,:1034-1038
+
+#matrix name dccm correl out correl.dat :1-1033@CA,:1034-1038
+matrix name dccm correl out correl.dat :1-XXX@CA
+#matrix name matc covar out covar.dat :YYY@CA,C,N,O
+#diagmatrix matc out evecs.dat name diagmodes vecs 4
+run
+
+#       #YYY: protein res. 
+#       #XXX: system res.
+#center :1-1031
+#image center familiar
+#rms reference :3-101,117-340,372-509,523-621,637-860,892-1029@CA,C,N,O
+#projection evecs diagmodes out project.dat beg 1 end 3 :3-101,117-340,372-509,523-621,637-860,892-1029@CA,C,N,O
+#go
+
+#rms ref RefAvg :1-612@CA,C,N,O
+#rms first out rms.out :1-612@CA,C,N
+#matrix name matc covar out covar.dat :1-612@CA,C,N 
+#diagmatrix matc out evecs.dat name diagmodes vecs 10
+#run
+#rms first out rms.out :1-612@CA,C,N
+#projection evecs evecs.dat out project.dat beg 1 end 3 :1-612@CA,C,N
+#go
