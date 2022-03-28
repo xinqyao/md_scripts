@@ -1,0 +1,163 @@
+## 1. Generate a compressed .nc trajectory file for the complex
+
+This step should be done on a local desktop in the lab. It is to take, for example, 1% of frames. 
+An example cpptraj input file is shown below (can be named, for example, cpptraj.in):
+   
+parm cypa_ts_nowat.prmtop
+trajin /userdata1/jvu/cyclophilin/cypa_ts/production_unrstr_bound.nc 100001 last 100
+center :1-176
+image center familiar
+trajout complex_cypa.nc onlyframes 1-20000
+go
+quit
+
+
+Then, type the following command to generate the file from the command line:
+
+cpptraj -i cpptraj.in &> err.log
+
+
+
+
+
+## 2. Modify the new_mmpbsa_setup.sh file to match your system
+
+A few things to check (maybe incomplete; check carefully):
+- prmtop file names (header only)
+- trajin file name (the file generated above)
+- residue ranges to strip to keep receptor or ligand only
+
+Make sure all the requested prmtop and trajin files exist under the current folder.
+
+
+
+
+
+## 3. Modify the following 3 files: 
+  script_c.in
+  script_r.in
+  script_l.in
+
+Check 'num_frames' and match it to your system.
+Set 'num_cores' to an appropriate number. For example, if we have 376 CPU cores, split it to assign:
+  160 to script_c.in
+  144 to script_r.in
+  72 to script_l.in
+
+
+
+
+
+## 4. Modify the math.sh file
+
+Open math.sh using vi.
+Match the numbers shown after '$(seq' to the number of cores set above.
+'complex' corresponds to 'script_c.in'
+'receptor' corresponds to 'script_r.in'
+'ligand' corresponds to 'script_l.in'
+
+
+
+
+
+## 5. Sync all files to the cluster
+
+rsync -av ./ mmomin@chemhamcluster.gsu.edu:/gpfs/mmomin/fahmed/cypa_ts_new/
+
+
+
+
+
+## 6. Login to the cluster
+
+ssh mmomin@chemhamcluster.gsu.edu
+cd /gpfs/mmomin/fahmed/cypa_ts_new
+
+
+
+
+
+## 7. Submit the prepration jobs
+
+bash new_mmpbsa_setup.sh
+
+It will generate many files and folders and submit 3 jobs.
+Check job status by
+   qstat
+
+Wail until all the 3 jobs are finished!
+
+Check error_file_ptraj_XXX files and make sure there is no error.
+Also check output_file_ptraj_XXX files and see if everything is okay.
+
+!!!!!!! IMPORTANT NOTE !!!!!!!!
+The original cypa_ts trajectory, production_unrstr_bound.nc, does not contain 'Time'. This is not a problem for Amber16 or later. But, on the cluster, only Amber14 is available, which will give an error. So, for cypa_ts, this step should be done on a local computer!!
+
+Go back to the local computer where you started. Sync from the cluster the following files:
+
+rsync -av mmomin@chemhamcluster.gsu.edu:/gpfs/mmomin/fahmed/cypa_ts_new/{\
+collect_complex.ptraj,\
+collect_receptor.ptraj,\
+collect_ligand.ptraj,\
+rstfiles} \
+  ./
+
+Then, execute the following commands:
+
+cpptraj cypa_ts_nowat.prmtop collect_complex.ptraj
+cpptraj cypa_ts_nowat.prmtop collect_receptor.ptraj
+cpptraj cypa_ts_nowat.prmtop collect_ligand.ptraj
+
+
+Then, sync the results back to the cluster:
+
+rsync -av rstfiles \
+  mmomin@chemhamcluster.gsu.edu:/gpfs/mmomin/fahmed/cypa_ts_new/
+
+
+At last, login to the cluster and go to the folder again, following Step 6.
+!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+## 8. Modify ligand.sh
+
+Open ligand.sh by vi. Change the line starting with 
+
+'#$ -q all.q' 
+
+to 
+
+'#$ -q r410.q'
+
+Save and quit.
+
+
+
+
+
+## 9. Submit MMPBSA jobs
+
+bash script_c.in
+bash script_r.in
+bash script_l.in
+
+Check job status:
+
+qstat
+
+Wait until all jobs are finished before moving to the next step.
+
+
+
+
+
+## 10. Post process
+
+bash math.sh cypa_ts
+
+The final result is in a file named 'MMPBSA_cypa_ts.mmpbsa'
+
