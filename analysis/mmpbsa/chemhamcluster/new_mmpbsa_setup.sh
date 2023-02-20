@@ -99,7 +99,7 @@ initial minimization w/ position restraints on DNA, 9.0 cut
   imin   = 1, ntx  = 1, ipb  = 2, inp = 2, 
  /
  &pb
-  epsout=80.0, epsin=1.0, fillratio=2.0,
+  epsout=80.0, epsin=4.0, fillratio=2.0,
   radiopt = 0,
  /
 EOF
@@ -110,7 +110,7 @@ initial minimization w/ position restraints on DNA, 9.0 cut
   imin   = 1, ntx  = 1, ipb  = 2, inp = 2, 
  /
  &pb
-  epsout=80.0, epsin=1.0, fillratio=4.0,
+  epsout=80.0, epsin=4.0, fillratio=4.0,
   radiopt = 0,
  /
 EOF
