@@ -1,0 +1,23 @@
+# How to visualize PC collective motions
+
+1. Create a backbone topology file.
+
+Open the 'stripe1.in' file and modify it as you see fit.
+Run the file by `cpptraj -i stripe1.in`.
+
+2. Generate a trajectory file of the collective motion.
+
+Modify the 'ptraj.vmd.in' file as you see fit. 
+`pcmin` is the leftmost PC value of data on the PC1-PC2, for example, conformer plot.
+`pcmax` is the rightmost PC value of data.
+`tmode` is the PC index.
+Run the file by `cpptraj -i ptraj.vmd.in`.
+
+3. Visualize the motion by VMD.
+
+Run `vmd -parm7 backbone.prmtop -netcdf pc1_mode.nc`.
+In VMD, create multiple representations. One should be for the main structure and display as e.g., white Cartoon.
+Pick up the next representation, change Drawing to 'Tube' (may also set Radius to 0.0) and Coloring to be consistent with the conformer plot.
+For the same representation of above, click the 'Trajectory' tab, set 'Draw Multiple Frames' to 0:XX, where 'XX' should correspond to the right boundary of the left "conformational cluster." 
+Repeat above two steps until the entire trajectory is displayed. For frame segments not corresponding to any cluster, color them differently (e.g., gray).
+
