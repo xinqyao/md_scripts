@@ -186,7 +186,7 @@ for {set i 0} {$i < 1024} {incr i} {
   scr <- c(scr, "display update on")
  
   ## Write PDB structure file
-  write.pdb(pdb=pdb, xyz=xyz0, file=pdbfile)
+  write.pdb(pdb=pdb, xyz=xyz0, file=pdbfile, ...)
   
   ## Write VMD script or PDB with conect records
   write(scr, file=vmdfile, sep="\n")
