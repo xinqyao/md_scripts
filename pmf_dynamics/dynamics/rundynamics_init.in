@@ -1,0 +1,49 @@
+#!/bin/bash 
+
+#export LD_LIBRARY_PATH=/software/usr/cuda-8.0/lib64:/usr/lib64/openmpi/lib/:${LD_LIBRARY_PATH}
+#export CUDA_VISIBLE_DEVICES="0"
+#
+#trap "exit" INT TERM
+#trap "kill 0" EXIT
+
+prv=180
+#set simult = (2500000 5000000 10000000 25000000 37500000 50000000)
+simult=(1000000 2500000 5000000 10000000)
+tnum=0
+
+prmtop_in=ffpspr_ppiase
+prmtop=ffpspr
+
+#for direc in 2.8 3.5 4.2 4.9 5.6; do
+#for direc in 3.5 4.2 4.9 5.6; do
+for direc in 6.3 7.0; do
+  if ! test -r $direc; then
+     mkdir $direc
+  fi
+
+  cd $direc
+
+  echo $direc, $tnum, ${simult[$tnum]}
+
+  if ! test -r production.${prv}.restrt; then
+     cp ../../windows/umbrella_${prv}/production.A.restrt ./production.${prv}.restrt
+  fi
+
+  if ! test -r ${prmtop}.bd.prmtop; then 
+    tt=$( echo 14.0 | awk '{printf "%.8E", $1/4}' )
+    sed "s/8.33250000E+00/$tt/" ../../prep/${prmtop_in}_box.prmtop > ./${prmtop}.bd.prmtop
+  fi
+
+  if ! test -r ${prmtop}_box.prmtop; then 
+    tt=$( echo $direc | awk '{printf "%.8E", $1/4}' )
+    sed "s/8.33250000E+00/$tt/" ../../prep/${prmtop_in}_box.prmtop > ./${prmtop}_box.prmtop
+  fi
+  
+  echo "Exiting directory ..."
+
+  cd ..
+
+#@ tnum = $tnum + 1
+let tnum=tnum+1
+
+done

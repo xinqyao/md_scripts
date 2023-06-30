@@ -1,0 +1,47 @@
+parm ../../../prep/wt_lig_nowat.prmtop
+#reference ../../../prep/wt_lig_nowat.pdb
+trajin ../../production.00[1-5].mdcrd 1 last 10
+#trajin ../../production.001.mdcrd 1 10
+
+#       #YYY: protein res.
+#       #XXX: system res.
+center :1-2502
+image center familiar
+
+#nativecontacts :2-163&!@H= :166-417&!@H= name con distance 4.5 first resoffset 1 series resseries present resseriesout test.out skipnative
+nativecontacts :2-163&!@H= :166-417&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conA1_A2.out skipnative
+#nativecontacts :2-163&!@H= :2087-2248&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conA1_F1.out skipnative
+#nativecontacts :2-163&!@H= :2251-2502&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conA1_F2.out skipnative
+#nativecontacts :166-417&!@H= :2251-2502&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conA2_F2.out skipnative
+#
+#nativecontacts :2087-2248&!@H= :2251-2502&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conF1_F2.out skipnative
+#nativecontacts :2087-2248&!@H= :419-580&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conF1_B1.out skipnative
+#nativecontacts :2087-2248&!@H= :583-834&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conF1_B2.out skipnative
+#nativecontacts :2251-2502&!@H= :583-834&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conF2_B2.out skipnative
+#
+#nativecontacts :419-580&!@H= :583-834&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conB1_B2.out skipnative
+#nativecontacts :419-580&!@H= :1253-1414&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conB1_D1.out skipnative
+#nativecontacts :419-580&!@H= :1417-1668&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conB1_D2.out skipnative
+#nativecontacts :583-834&!@H= :1417-1668&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conB2_D2.out skipnative
+#
+#nativecontacts :1253-1414&!@H= :1417-1668&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conD1_D2.out skipnative
+#nativecontacts :1253-1414&!@H= :836-997&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conD1_C1.out skipnative
+#nativecontacts :1253-1414&!@H= :1000-1251&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conD1_C2.out skipnative
+#nativecontacts :1417-1668&!@H= :1000-1251&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conD2_C2.out skipnative
+#
+#nativecontacts :836-997&!@H= :1000-1251&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conC1_C2.out skipnative
+#nativecontacts :836-997&!@H= :1670-1831&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conC1_E1.out skipnative
+#nativecontacts :836-997&!@H= :1834-2085&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conC1_E2.out skipnative
+#nativecontacts :1000-1251&!@H= :1834-2085&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conC2_E2.out skipnative
+#
+#nativecontacts :1670-1831&!@H= :1834-2085&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conE1_E2.out skipnative
+#nativecontacts :1670-1831&!@H= :2-163&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conE1_A1.out skipnative
+#nativecontacts :1670-1831&!@H= :166-417&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conE1_A2.out skipnative
+#nativecontacts :1834-2085&!@H= :166-417&!@H= distance 4.5 first resoffset 1 series resseries present resseriesout conE2_A2.out skipnative
+
+#savenonnative 
+go
+
+#write test.out con[native] con[nonnative]
+
+

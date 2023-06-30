@@ -1,15 +1,17 @@
 #!/bin/sh 
 
-module load amber/20 wham
+## Just prepare folders for US calculations
+
+#module load amber/20 wham
 
 #export LD_LIBRARY_PATH=/software/usr/cuda-8.0/lib64:/usr/lib64/openmpi/lib/:${LD_LIBRARY_PATH}
-export CUDA_VISIBLE_DEVICES="0"
+#export CUDA_VISIBLE_DEVICES="0"
 
 sys=ffpspr_box
 paras=(2.8 3.5 4.2 4.9 5.6)
 
-# number of nanoseconds
-nchunks=30
+# number of nanoseconds (not used)
+nchunks=1
 
 # atom indexes defining the omega angle
 atom1=49
@@ -39,7 +41,7 @@ for ((rnum=1; rnum<=$nchunks; rnum++)); do
       cd $direc
 
       for ((angles=180; angles>=-175; angles-=5)); do
-         if [[ $angles -gt $ang2 ]] && [[ $angles -lt $ang1 ]]; then
+         if [ $angles -gt $ang2 ] && [ $angles -lt $ang1 ]; then
             continue
          fi
          f=$angles
@@ -109,41 +111,41 @@ DUMPAVE=ang.temp.out
 EOF
          fi
  
-         cp production.${f}.restrt production.run.restrt
+#         cp production.${f}.restrt production.run.restrt
 
-         if ! pmemd.cuda -O -i production.in -p ${sys}.prmtop -c production.run.restrt -o production.${f}.out -r production.${f}.restrt; then
-            bok=FALSE
-         fi
+#         if ! pmemd.cuda -O -i production.in -p ${sys}.prmtop -c production.run.restrt -o production.${f}.out -r production.${f}.restrt; then
+#            bok=FALSE
+#         fi
 
-         sleep 5
+#         sleep 5
 
-         cat ang.temp.out >> ang.${f}.out
+#         cat ang.temp.out >> ang.${f}.out
       done
 
-      if ! test -r wham; then 
-         mkdir -p wham/tmp
-         cp ../metafile wham/
-      fi
-      cd wham
-      tnum=$(wc -l < ../ang.0.out)
-      for ifile in ../ang.[-0-9]*.out; do
-         awk "(NR>($tnum-50000)){a=\$2; if(a<-90) a=a+360; print \$1, a}" $ifile >> tmp/$(basename $ifile)
-      done
-      wham -31.5 208.5 80 0.000001 300.0 0 metafile pmf.out 10 1234 &> err.log
-      awk 'NR > 1 && NR <82{print $1,$2,$3}' pmf.out > fep.${rnum}.out
-      cd ..
+#      if ! test -r wham; then 
+#         mkdir -p wham/tmp
+#         cp ../metafile wham/
+#      fi
+#      cd wham
+#      tnum=$(wc -l < ../ang.0.out)
+#      for ifile in ../ang.[-0-9]*.out; do
+#         awk "(NR>($tnum-50000)){a=\$2; if(a<-90) a=a+360; print \$1, a}" $ifile >> tmp/$(basename $ifile)
+#      done
+#      wham -31.5 208.5 80 0.000001 300.0 0 metafile pmf.out 10 1234 &> err.log
+#      awk 'NR > 1 && NR <82{print $1,$2,$3}' pmf.out > fep.${rnum}.out
+#      cd ..
       cd ..
    done
 done
 
-if test $cleanup == "TRUE"; then
-   for direc in ${paras[@]}; do
-      rm -rf $direc/wham/{pmf.out,tmp} $direc/ang.temp.out 
-   done
-fi
-
-if test $bok == "FALSE"; then
-   echo Done with errors.
-   exit 1
-fi
+#if test $cleanup == "TRUE"; then
+#   for direc in ${paras[@]}; do
+#      rm -rf $direc/wham/tmp
+#   done
+#fi
+#
+#if test $bok == "FALSE"; then
+#   echo Done with errors.
+#   exit 1
+#fi
 

@@ -91,14 +91,5 @@ nohup ./run_umbrella.in &> err.log &
 
 cd ..
 
-cd us
-## create a file: runus.sh
-## also, metafile
-vi runus.sh
+## check 'us' and 'dynamics' folders for umbrella sampling and kinetics analysis, respectively.
 
-cd ..
-
-#transfer files and execute one by one equil, windows, and us
-# cd equil; ./jobe.in &> err.log
-# cd ../windows; ./run_umbrella.in
-# cd ../us; ./runus.sh

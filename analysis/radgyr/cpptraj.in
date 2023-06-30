@@ -1,0 +1,16 @@
+parm ../../XX_nowat.prmtop
+trajin ../../production.A.mdcrd
+trajin ../../production.B.mdcrd
+trajin ../../production.C.mdcrd
+#...
+
+#       #YYY: protein res.
+#       #XXX: system res.
+center :1-YYY
+image center familiar
+
+radgyr :1-XXX@XXX out rg.txt mass nomax tensor
+# radgyr :4-10&!(@H=) out rg.txt mass nomax
+
+go
+

@@ -1,5 +1,5 @@
 if test $# -lt 1; then
-   echo "Usage: ./check.sh logfile"
+   echo "Usage: ./check_log.sh logfile"
    exit 0
 fi
 
